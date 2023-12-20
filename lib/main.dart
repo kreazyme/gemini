@@ -6,10 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:image_picker/image_picker.dart';
+// # flutter build web --release
 
 void main() {
+  print(const String.fromEnvironment("API_KEY"));
   Gemini.init(
-    apiKey: 'AIzaSyD1U91hjPodGHk3ewxw-xeJmOzAOHayErQ',
+    apiKey: const String.fromEnvironment('API_KEY'),
   );
   runApp(const MyApp());
 }
@@ -96,8 +98,12 @@ class _HomePageState extends State<HomePage> {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image?.path == null) return;
     setState(() {
-      messages.add(const MessageGemini(
-        message: "Thingking about image",
+      messages.add(MessageGemini(
+        image: image,
+        isUser: true,
+      ));
+      messages.add(MessageGemini(
+        message: "Thingking about image...",
         isUser: false,
       ));
     });
@@ -187,15 +193,17 @@ class _HomePageState extends State<HomePage> {
                                     right: 100,
                                   ),
                                   child: MarkdownBody(
-                                    data: messages[index].message,
+                                    data: messages[index].message!,
                                   ),
                                 )
-                              : Text(
-                                  messages[index].message,
-                                  style:
-                                      const TextStyle(color: Colors.deepPurple),
-                                  textAlign: TextAlign.end,
-                                ),
+                              : messages[index].message == null
+                                  ? Image.network(messages[index].image!.path)
+                                  : Text(
+                                      messages[index].message!,
+                                      style: const TextStyle(
+                                          color: Colors.deepPurple),
+                                      textAlign: TextAlign.end,
+                                    ),
                         );
                       },
                     ),
@@ -239,11 +247,13 @@ class _HomePageState extends State<HomePage> {
 }
 
 class MessageGemini {
-  final String message;
+  final String? message;
   final bool isUser;
+  XFile? image;
 
-  const MessageGemini({
-    required this.message,
+  MessageGemini({
+    this.message,
     required this.isUser,
+    this.image,
   });
 }

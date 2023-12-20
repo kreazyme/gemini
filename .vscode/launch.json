@@ -7,7 +7,11 @@
         {
             "name": "gemini",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": [
+                "--dart-define-from-file",
+                "config.json"
+            ]
         },
         {
             "name": "gemini (profile mode)",
